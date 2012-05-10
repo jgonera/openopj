@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<phpunit backupGlobals="false"
+         backupStaticAttributes="false"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         printerClass="PHPUnit_Extensions_Progress_ResultPrinter"
+         printerFile="./support/phpunit-progress/PHPUnit/Extensions/Progress/ResultPrinter.php"
+         processIsolation="false"
+         stopOnError="false"
+         stopOnFailure="false"
+         stopOnIncomplete="false"
+         stopOnSkipped="false"
+         strict="true"
+         verbose="true">
+  <testsuites>
+    <testsuite name="OpenOPJ test suite">
+      <directory>./test/</directory>
+    </testsuite>
+  </testsuites>
+</phpunit>

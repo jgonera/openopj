@@ -1,0 +1,3 @@
+[submodule "support/phpunit-progress"]
+	path = support/phpunit-progress
+	url = https://github.com/Maher4Ever/phpunit-progress
