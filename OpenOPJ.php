@@ -4,23 +4,44 @@ namespace OpenOPJ;
 class OpenOPJException extends \Exception {}
 class FileReadError extends OpenOPJException {}
 
-class OpenOPJ {
-    public $worksheets;
+class FileReader {
     protected $fileHandle;
 
     function __construct($fileName) {
         $this->fileHandle = @fopen($fileName, 'rb');
         if (!$this->fileHandle) throw new FileReadError("Can't read file $fileName");
         flock($this->fileHandle, LOCK_SH);
+    }
 
-        $this->parse();
-
+    function __destruct() {
         flock($this->fileHandle, LOCK_UN);
         fclose($this->fileHandle);
     }
 
-    protected function parse() {
+    public function readLine() {
+        return fgets($this->fileHandle);
+    }
+}
 
+class OpenOPJ {
+    protected $file;
+    public $header, $worksheets;
+
+    function __construct($fileName) {
+        $this->file = new FileReader($fileName);
+        $this->parse();
+        unset($this->file);
+    }
+
+    protected function parse() {
+        $this->parseHeader();
+    }
+
+    protected function parseHeader() {
+        $tmp = explode(' ', $this->file->readLine());
+        $this->header['id'] = $tmp[0];
+        $this->header['version'] = $tmp[1];
+        $this->header['build'] = (int)$tmp[2];
     }
 }
 ?>
