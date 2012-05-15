@@ -1,12 +1,12 @@
 <?php
-require_once('OpenOPJ.php');
+require_once('test/helper.php');
 
-use OpenOPJ\OpenOPJ;
+use OpenOPJ\OPJFile;
 
-class OpenOPJTest extends PHPUnit_Framework_TestCase {
+class OPJFileTest extends PHPUnit_Framework_TestCase {
 
     protected function setUp() {
-        $this->opj = new OpenOPJ('support/test.opj');
+        $this->opj = new OPJFile('support/test.opj');
     }
 
     public function testFileReadError() {
@@ -14,6 +14,7 @@ class OpenOPJTest extends PHPUnit_Framework_TestCase {
         $opj = new OpenOPJ('support/nonexistent.opj');
     }
 
+    /** @group wip */
     public function testHeader() {
         $this->assertEquals('CPYA', $this->opj->header['id']);
         $this->assertEquals('4.2673', $this->opj->header['version']);

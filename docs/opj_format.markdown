@@ -17,11 +17,12 @@ General observations
 
 * Files seem to be divided into blocks sperated by line feeds (0x0A).
 * Integers are little endian.
-* 4-byte blocks seem to indicate the size of the upcoming block (probably
-  in case it contains 0x0A as its data in which case it cannot be treated
+* 4-byte blocks seem to indicate the size of the following block (most likely
+  in case it contains 0x0A as its data in which case it could not be treated
   as a regular block separator).
-* A 4-byte block filled with 0x0 immediately followed by another 4-byte block
-  seems to be and ID of a structure.
+* Sometimes there are 4-byte blocks filled with 0s. It seems they just should
+  be skipped. There is no zero-length block following them, instead there is
+  another non-zero 4-byte size block.
 
 
 File structure
@@ -39,7 +40,7 @@ A few values separated by spaces (0x20) and terminated with a line feed (0x0A).
         Build number terminated with "#"
 
 
-### Unknown
+### Unknown block
 
 A block indicating size and then a block with data (a subheader with additional
 information?).
@@ -47,19 +48,27 @@ information?).
     0x0000, 5 bytes
         [size] + line feed.
     0x0005, [size] + 1 bytes
-        Data + line feed.
+        Unknown + line feed.
 
 
-### Data blocks
+### Data
 
-Each data block starts with a 0x0 + 0x7B two-block identifier:
+Data consists of two blocks: header and content. It can contain worksheet
+column values, matrix or graph data. liborigin calls each header and content
+group a "column".
+
+
+#### Data header blocks
+
+Each data header block is prepended with a 0x0 block and a following size
+block:
 
     0x0000, 5 bytes
         Zeros + line feed.
     0x0005, 5 bytes
-        0x7B ID + line feed.
+        [size] + line feed. Size seems to be always 123.
 
-Then the data follows in the next block:
+The data header block itself has the following structure:
 
     0x0000, 22 bytes
         Unknown.
@@ -77,4 +86,10 @@ Then the data follows in the next block:
         Unknown.
     0x0058, 25 bytes, zero-padded string
         Data name, for worksheets it's "WORKSHEET_COLUMN".
+    0x0071, 10 bytes
+        Unknown.
+
+
+#### Data content blocks
+
 

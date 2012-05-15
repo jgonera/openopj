@@ -1,6 +1,8 @@
 <?php
 namespace OpenOPJ;
 
+require_once('Logger.php');
+
 class OpenOPJException extends \Exception {}
 class FileReadError extends OpenOPJException {}
 
@@ -23,8 +25,8 @@ class FileReader {
     }
 }
 
-class OpenOPJ {
-    protected $file;
+class OPJFile {
+    protected $debug, $file;
     public $header, $worksheets;
 
     function __construct($fileName) {
@@ -35,6 +37,7 @@ class OpenOPJ {
 
     protected function parse() {
         $this->parseHeader();
+        Logger::log('test');
     }
 
     protected function parseHeader() {
