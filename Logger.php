@@ -13,7 +13,7 @@ class Logger {
             $args = func_get_args();
             $args[0] .= "\n";
             $msg = call_user_func_array('sprintf', $args);
-            $handler($args[0]);
+            $handler($msg);
         }
     }
 }
