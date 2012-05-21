@@ -9,14 +9,15 @@ addon (version 1.24.0.2, addon disk version 7.10).
 Version of OPJ files: 4.2673, build: 552.
 
 Some format information taken from [liborigin][], [liborigin2][]
-and [SciDAVis OPJ import filter][].
+and [SciDAVis][] [importOPJ][] filter in Python.
 
 Author: Juliusz Gonera
 
 [ITC200]: http://www.microcal.com/products/itc/itc200.asp
 [liborigin]: http://sourceforge.net/projects/liborigin/
 [liborigin2]: http://soft.proindependent.com/liborigin2/
-[SciDAVis OPJ import filter]: https://scidavis.svn.sourceforge.net/svnroot/scidavis/branches/origin_import/importOPJ
+[SciDAVis]: http://scidavis.sourceforge.net/
+[importOPJ]: https://scidavis.svn.sourceforge.net/svnroot/scidavis/branches/origin_import/importOPJ
 
 
 General observations
@@ -37,23 +38,8 @@ as a regular block separator).
 
 Sometimes there are 4-byte blocks filled with 0s. There is no zero-length
 block following them. They seem to serve as a separator of file sections
-and can appear in groups (often of 2 or 3, sometimes 5).
-
-
-#### Exceptions
-
-After three (or more?) 0 size blocks close to the end of the file, there is
-no another size block. Instead data of unknown length may follow (either
-binary blocks or lines of ASCII text) terminated by a 1-byte 0 block
-(`0A 00 0A`).
-
-It seems that, except for this case, three or more 0 size blocks are always
-followed by a 486 size block. This fact can be used to detect this exception.
-However, it is possible that something else than a 486 size block can also
-occur after three or more 0 size blocks.
-
-TODO: Check if there's really nothing else that can appear after three 0 size
-blocks.
+and can appear in groups (often of 2 or 3, sometimes 5) if several nested
+sections end.
 
 
 File structure
@@ -85,10 +71,10 @@ OPJ files are divided in the following sections:
         Attachment sublist 1
         Attachment sublist 2
 
-Sections are terminated with a 0 size block.
+Sections are terminated with a 0 size block (`0A 00 00 00 00 0A`).
 
 
-### Signature string
+### Signature
 
 A string containing three values separated by spaces (0x20) and terminated
 with a line feed (0x0A).
@@ -105,7 +91,7 @@ This is the only section that doesn't end with a 0 size block.
 
 ### Header
 
-Since Origin 6.1 contains Origin version.
+Since Origin 6.1 contains Origin version (importOPJ).
 
     0x0000, 27 bytes
         Unknown.
@@ -117,16 +103,14 @@ Since Origin 6.1 contains Origin version.
 
 ### Data list
 
-Data section contains dataset subsections.
+Data list contains multiple data sections one after another.
 
 
 #### Data section
 
 Data section consists of two blocks: header and content. It can contain
-worksheet column values, matrix or graph data. liborigin calls each header
-and content group a "column".
-
-Data sections seem to end with two 0 size blocks and a 195 size block.
+worksheet column values, matrix or graph data. liborigin calls each data
+section a "column".
 
 
 ##### Data header block
@@ -139,15 +123,23 @@ The data header block itself has the following structure:
     0x0000, 22 bytes
         Unknown.
     0x0016, 2 bytes, short int
-        [dataType] (from liborigin).
-    0x0018, 37 bytes
+        [dataType] (liborigin).
+    0x0018, 1 byte
+        [dataType2] (importOPJ).
+    0x0019, 4 bytes, int
+        [totalRows] (importOPJ).
+    0x001D, 4 bytes, int
+        [firstRow] (importOPJ).
+    0x0021, 4 bytes, int
+        [lastRow] (importOPJ).
+    0x0025, 24 bytes
         Unknown.
-    0x003D, 1 byte, char
+    0x003D, 1 byte
         [valueSize], size of a single data value.
     0x003E, 1 byte
         Unknown.
-    0x003F, 1 byte, char
-        [dataTypeU] (from liborigin).
+    0x003F, 1 byte
+        [dataTypeU] (liborigin).
     0x0040, 24 bytes
         Unknown.
     0x0058, 25 bytes, zero-padded string
@@ -155,7 +147,28 @@ The data header block itself has the following structure:
     0x0071, 10 bytes
         Unknown.
 
+According to importOPJ the bytes starting at 0x0071 didn't exist before
+Origin 5.0.
+
 
 ##### Data content block
 
 
+
+### Parameters section
+
+This section contains an arbitrary number of parameter elements. Each element
+consists of:
+
+    0x0000, n characters
+        Parameter name.
+    n, 1 byte
+        Line feed.
+    n+1, 8 bytes, double
+        Parameter value.
+    n+9, 1 byte
+        Line feed.
+
+The last parameter element is followed by a 0 byte and a line feed (`00 0A`),
+i.e. if you encounter a parameter name equal to 0x0, there are no more
+parameter elements.

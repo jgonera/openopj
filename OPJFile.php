@@ -2,127 +2,57 @@
 namespace OpenOPJ;
 
 require_once('Logger.php');
-
-class OpenOPJException extends \Exception {}
-class FileReadError extends OpenOPJException {}
-class UnexpectedEndError extends OpenOPJException {}
-
-function prettyHex($data) {
-    return chunk_split(bin2hex($data), 2, ' ');
-}
-
-class FileReader {
-    protected $fileHandle;
-
-    function __construct($fileName) {
-        $this->fileHandle = @fopen($fileName, 'rb');
-        if (!$this->fileHandle) throw new FileReadError("Can't read file $fileName");
-        flock($this->fileHandle, LOCK_SH);
-    }
-
-    function __destruct() {
-        flock($this->fileHandle, LOCK_UN);
-        fclose($this->fileHandle);
-    }
-
-    public function offset() {
-        return ftell($this->fileHandle);
-    }
-
-    public function readLine() {
-        return fgets($this->fileHandle);
-    }
-
-    public function readBytes($count) {
-        $data = fread($this->fileHandle, $count);
-        if (!$data) {
-            throw new UnexpectedEndError();
-        }
-        return $data;
-    }
-
-    public function skipBytes($count) {
-        fseek($this->fileHandle, $count, SEEK_CUR);
-    }
-
-    public function finished() {
-        return feof($this->fileHandle);
-    }
-}
+require_once('common.php');
+require_once('DataList.php');
 
 class OPJFile {
-    protected $debug, $file, $stats = array();
-    public $header, $worksheets;
+    public $signature = array(), $header = array(), $data = array();
 
     function __construct($fileName) {
-        $this->file = new FileReader($fileName);
+        $this->file = new OPJReader($fileName);
         $this->parse();
         unset($this->file);
     }
 
     protected function parse() {
+        $this->parseSignature();
         $this->parseHeader();
-        $this->skipUnknownBlock();
-        try {
-            $this->parseDataSections();
-        } catch (\Exception $e) {
-        }
-        Logger::log(print_r($this->stats[123], true));
+        $this->parseDataList();
+        //try {
+            //$this->parseUnknown();
+        //} catch (\Exception $e) {
+        //}
     }
 
-    protected function parseHeader() {
+    protected function parseSignature() {
         $tmp = explode(' ', $this->file->readLine());
-        $this->header['id'] = $tmp[0];
-        $this->header['version'] = $tmp[1];
-        $this->header['build'] = (int)$tmp[2];
+        $this->signature['id'] = $tmp[0];
+        $this->signature['version'] = $tmp[1];
+        $this->signature['build'] = (int)$tmp[2];
         Logger::log(
             "OPJ version: %s, build: %d",
-            $this->header['version'],
-            $this->header['build']
+            $this->signature['version'],
+            $this->signature['build']
         );
     }
 
-    protected function readSizeBlock() {
-        $size = 0;
-        while ($size === 0) {
-            $tmp = unpack('Vsize', $this->file->readBytes(4));
-            $size = $tmp['size'];
-            Logger::log("Size block (%d) at 0x%X", $size, $this->file->offset() - 4);
-            // line feed
-            $this->file->skipBytes(1);
+    protected function parseHeader() {
+        $size = $this->file->readSizeBlock();
+        if ($size === 39) {
+            $this->file->seek(27);
+            $this->header = unpack('doriginVersion', $this->file->read(8));
+            $this->file->seek(4 + 1);
+            Logger::log("Origin version: %s", $this->header['originVersion']);
+        } else {
+            Logger::log("Unexpected header size: $size, skipping");
+            $this->file->seek($size + 1);
         }
-        return $size;
+        $this->file->findSectionEnd();
     }
 
-    protected function skipUnknownBlock() {
-        $size = $this->readSizeBlock();
-        Logger::log("Skipping unknown block of size $size at 0x%X", $this->file->offset());
-        $dump = prettyHex($this->file->readBytes(20));
-        //Logger::log("Block starts with: %s", $dump);
-
-        if (!isset($this->stats[$size])) {
-            $this->stats[$size] = array();
-        }
-        $this->stats[$size][] = $dump;
-
-        $this->file->skipBytes($size - 20 + 1);
+    protected function parseDataList() {
+        $dataList = new DataList($this->file);
+        $this->data = $dataList->data;
     }
-
-    protected function parseDataSections() {
-        while (!$this->file->finished()) {
-            $this->skipUnknownBlock();
-            //$this->parseDataHeaderBlock();
-            //$this->parseDataContentBlock();
-        }
-    }
-
-    protected function parseDataHeaderBlock() {
-        
-    }
-
-    protected function parseDataContentBlock() {
-
-    }
-
 }
 ?>

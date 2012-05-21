@@ -14,15 +14,19 @@ class OPJFileTest extends PHPUnit_Framework_TestCase {
         $opj = new OpenOPJ('support/nonexistent.opj');
     }
 
-    /** @group wip */
-    public function testHeader() {
-        $this->assertEquals('CPYA', $this->opj->header['id']);
-        $this->assertEquals('4.2673', $this->opj->header['version']);
-        $this->assertEquals(552, $this->opj->header['build']);
+    public function testSignature() {
+        $this->assertEquals('CPYA', $this->opj->signature['id']);
+        $this->assertEquals('4.2673', $this->opj->signature['version']);
+        $this->assertEquals(552, $this->opj->signature['build']);
     }
 
-    //public function testWorksheetCount() {
-        //$this->assertCount(4, $this->opj->worksheets);
-    //}
+    public function testHeader() {
+        $this->assertEquals(7.0552, $this->opj->header['originVersion']);
+    }
+
+    /** @group wip */
+    public function testData() {
+        $this->assertArrayHasKey('Data1_DH', $this->opj->data);
+    }
 }
 ?>
