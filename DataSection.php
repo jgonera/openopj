@@ -17,27 +17,18 @@ class DataSection extends Section {
     }
 
     protected function parseDataHeader() {
-        $size = $this->file->readSizeBlock();
-        if ($size < 113) {
+        $block = $this->file->readBlock();
+        if ($block->size() < 113) {
             Logger::log("Unexpected data header block size: $size");
-            $this->file->seek($size + 1);
             return false;
         }
-        $this->file->seek(22);
         $this->header = unpack(
             'vdataType/CdataType2/VtotalRows/VfirstRow/VlastRow',
-            $this->file->read(15)
+            $block->slice(0x16, 15)
         );
-        $this->file->seek(24);
-        $this->header += unpack(
-            'CvalueSize/x/CdataTypeU',
-            $this->file->read(3)
-        );
-        $this->file->seek(24);
-        $this->header += unpack('a25name', $this->file->read(25));
+        $this->header += unpack('CvalueSize/x/CdataTypeU', $block->slice(0x3D, 3));
+        $this->header += unpack('a25name', $block->slice(0x58, 25));
         $this->name = $this->header['name'];
-        $this->file->seek(10);
-        $this->file->seek(1);
         Logger::log("Data section name: $this->name");
         print_r($this->header);
     }

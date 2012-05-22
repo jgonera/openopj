@@ -8,7 +8,7 @@ require_once('DataList.php');
 class OPJFile {
     public $signature = array(), $header = array(), $data = array();
 
-    function __construct($fileName) {
+    public function __construct($fileName) {
         $this->file = new OPJReader($fileName);
         $this->parse();
         unset($this->file);
@@ -18,10 +18,6 @@ class OPJFile {
         $this->parseSignature();
         $this->parseHeader();
         $this->parseDataList();
-        //try {
-            //$this->parseUnknown();
-        //} catch (\Exception $e) {
-        //}
     }
 
     protected function parseSignature() {
@@ -37,15 +33,12 @@ class OPJFile {
     }
 
     protected function parseHeader() {
-        $size = $this->file->readSizeBlock();
-        if ($size === 39) {
-            $this->file->seek(27);
-            $this->header = unpack('doriginVersion', $this->file->read(8));
-            $this->file->seek(4 + 1);
+        $block = $this->file->readBlock();
+        if ($block->size() === 39) {
+            $this->header = unpack('doriginVersion', $block->slice(0x1B, 8));
             Logger::log("Origin version: %s", $this->header['originVersion']);
         } else {
             Logger::log("Unexpected header size: $size, skipping");
-            $this->file->seek($size + 1);
         }
         $this->file->findSectionEnd();
     }

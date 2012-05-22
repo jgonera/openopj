@@ -10,13 +10,11 @@ class DataList extends Section {
 
     protected function parse() {
         Logger::log("Data list at 0x%X", $this->file->offset());
-        while ($this->file->peekSizeBlock()) {
+        while (!$this->file->isSectionEnd()) {
             $dataSection = new DataSection($this->file);
             $this->data[$dataSection->name] = $dataSection->data;
         }
-        $this->file->findSectionEnd();
     }
-            
 }
 
 ?>
