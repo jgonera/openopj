@@ -38,7 +38,7 @@ class OPJFile {
             $this->header = unpack('doriginVersion', $block->slice(0x1B, 8));
             Logger::log("Origin version: %s", $this->header['originVersion']);
         } else {
-            Logger::log("Unexpected header size: $size, skipping");
+            Logger::log("Unexpected header size: %d, skipping", $block->size());
         }
         $this->file->findSectionEnd();
     }

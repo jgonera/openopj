@@ -11,7 +11,7 @@ class OPJFileTest extends PHPUnit_Framework_TestCase {
 
     public function testFileReadError() {
         $this->setExpectedException('OpenOPJ\FileReadError');
-        $opj = new OpenOPJ('support/nonexistent.opj');
+        $opj = new OPJFile('support/nonexistent.opj');
     }
 
     public function testSignature() {
@@ -24,9 +24,39 @@ class OPJFileTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(7.0552, $this->opj->header['originVersion']);
     }
 
-    /** @group wip */
-    public function testData() {
-        $this->assertArrayHasKey('Data1_DH', $this->opj->data);
+    public function testDataNames() {
+        $names = array(
+            'Data1_DH', 'Data1_INJV', 'Data1_Xt', 'Data1_Mt', 'Data1_XMt',
+            'Data1_NDH', 'Data1RAW_time', 'Data1RAW_cp', 'Data1BEGIN',
+            'Data1RANGE', 'Data1Coeff_Time', 'Data1Coeff_Base',
+            'Data1Coeff_Spline', 'Data1Coeff_Coeff', 'Data1Coeff_Net',
+            'Data1spline_Time', 'Data1spline_Base', 'DATA1BASE', 'Data1_Fit',
+            'Data1_DY', 'Test_Text', 'Test_TextNumeric'
+        );
+        foreach ($names as $name) {
+            $this->assertArrayHasKey($name, $this->opj->data);
+        }
     }
+
+    public function testDataDoubleContents() {
+        $this->assertEquals(0.4, $this->opj->data['Data1_INJV'][0]);
+        $this->assertEquals(2.0, $this->opj->data['Data1_INJV'][19]);
+        $this->assertNull($this->opj->data['Data1_INJV'][20]);
+    }
+
+    public function testDataTextNumericContents() {
+        $this->assertNull($this->opj->data['Data1_DY'][0]);
+        $this->assertEquals(-33.23707, $this->opj->data['Data1_DY'][1], '', 0.00001);
+        $this->assertEquals(-60.56222, $this->opj->data['Data1_DY'][19], '', 0.00001);
+
+        $this->assertEquals('text', $this->opj->data['Test_TextNumeric'][0]);
+        $this->assertEquals(3.14, $this->opj->data['Test_TextNumeric'][1]);
+    }
+
+    public function testDataTextContents() {
+        $this->assertEquals('test string 123', $this->opj->data['Test_Text'][0]);
+        $this->assertEquals('only text', $this->opj->data['Test_Text'][1]);
+    }
+
 }
 ?>

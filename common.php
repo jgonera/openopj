@@ -3,8 +3,9 @@ namespace OpenOPJ;
 
 class OpenOPJException extends \Exception {}
 class FileReadError extends OpenOPJException {}
-class UnexpectedEndError extends OpenOPJException {}
-class BlockSeparatorError extends OpenOPJException {}
+class ParseError extends OpenOPJException {}
+class UnexpectedEndError extends ParseError {}
+class BlockSeparatorError extends ParseError {}
 
 function prettyHex($data) {
     return chunk_split(bin2hex($data), 2, ' ');
@@ -49,6 +50,8 @@ class FileReader {
     }
 }
 
+// binary data wrapper, uses mb_* functions in case mbstring.func_overload is
+// set
 class Block {
     const BLOCK_SEPARATOR = 0x0A;
     public $data;
@@ -61,7 +64,7 @@ class Block {
     }
 
     public function size() {
-        return mb_strlen($this->data, '8bit');
+        return mb_strlen($this->data, '8bit') - 1;
     }
 
     public function slice($offset, $length) {
