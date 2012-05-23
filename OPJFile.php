@@ -18,6 +18,7 @@ class OPJFile {
         $this->parseSignature();
         $this->parseHeader();
         $this->parseDataList();
+        $this->parseWindowList();
     }
 
     protected function parseSignature() {
@@ -46,6 +47,10 @@ class OPJFile {
     protected function parseDataList() {
         $dataList = new DataList($this->file);
         $this->data = $dataList->data;
+    }
+
+    protected function parseWindowList() {
+
     }
 }
 ?>

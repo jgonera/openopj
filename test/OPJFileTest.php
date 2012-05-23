@@ -38,7 +38,7 @@ class OPJFileTest extends PHPUnit_Framework_TestCase {
         }
     }
 
-    public function testDataDoubleContents() {
+    public function testDataNumericContents() {
         $this->assertEquals(0.4, $this->opj->data['Data1_INJV'][0]);
         $this->assertEquals(2.0, $this->opj->data['Data1_INJV'][19]);
         $this->assertNull($this->opj->data['Data1_INJV'][20]);
@@ -56,6 +56,12 @@ class OPJFileTest extends PHPUnit_Framework_TestCase {
     public function testDataTextContents() {
         $this->assertEquals('test string 123', $this->opj->data['Test_Text'][0]);
         $this->assertEquals('only text', $this->opj->data['Test_Text'][1]);
+    }
+
+    public function testFirstRowNotZero() {
+        $this->assertNull($this->opj->data['Test_firstRow'][0]);
+        $this->assertEquals(5.23, $this->opj->data['Test_firstRow'][1]);
+        $this->assertEquals(7, $this->opj->data['Test_firstRow'][2]);
     }
 
 }

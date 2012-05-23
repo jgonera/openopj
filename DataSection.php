@@ -24,7 +24,7 @@ class DataSection extends Section {
             return false;
         }
         $this->header = unpack(
-            'vdataType/CdataType2/VtotalRows/VfirstRow/VusedRows',
+            'vdataType/CdataType2/VtotalRows/VfirstRow/VlastRow',
             $block->slice(0x16, 15)
         );
         $this->header += unpack('CvalueSize/x/CdataTypeU', $block->slice(0x3D, 3));
@@ -39,9 +39,9 @@ class DataSection extends Section {
     protected function parseDataContent() {
         $block = $this->file->readBlock();
         $valueSize = $this->header['valueSize'];
-        $offset = $this->header['firstRow'] * $valueSize;
-        $length = $this->header['usedRows'] * $valueSize;
-        $rawData = $block->slice($offset, $length);
+        $offset = 0;
+        $end = $this->header['lastRow'] * $valueSize;
+        $rawData = $block->slice($offset, $end - $offset);
 
         if ($valueSize <= 8) {
             // Numeric
@@ -54,7 +54,6 @@ class DataSection extends Section {
             }
             $this->data = array_values(unpack($format, $rawData));
         } else {
-            $end = $offset + $length;
             while ($offset < $end) {
                 if ($this->header['dataType'] & 0x100) {
                     // Text & Numeric
