@@ -11,6 +11,10 @@ function prettyHex($data) {
     return chunk_split(bin2hex($data), 2, ' ');
 }
 
+function prettyBin($data, $length=32) {
+    return chunk_split(str_pad(decbin($data), $length, '0', STR_PAD_LEFT), 8, ' ');
+}
+
 class FileReader {
     protected $fileHandle;
 

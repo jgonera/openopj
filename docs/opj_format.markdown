@@ -39,7 +39,7 @@ as a regular block separator).
 Sometimes there are 4-byte blocks filled with 0s. There is no zero-length
 block following them. They seem to serve as a separator of file sections
 and can appear in groups (often of 2 or 3, sometimes 5) if several nested
-sections end.
+sections end. They can also indicate an empty block.
 
 
 File structure
@@ -112,6 +112,12 @@ Data section consists of two blocks: header and content. It can contain
 worksheet column values, matrix or graph data. liborigin calls each data
 section a "column".
 
+There is a separate data section for each worksheet column. In case of
+matrices, the values are stored in row-major order.
+
+In case of excels, the content block is empty (0 size block). The excel data
+is probably stored as attachments at the end of the file.
+
 
 ##### Data header block
 
@@ -123,7 +129,9 @@ The data header block itself has the following structure:
     0x0000, 22 bytes
         Unknown.
     0x0016, 2 bytes, short int
-        [dataType] (liborigin).
+        [dataType] (liborigin). Known flags:
+        0x100: indicates that values are Text & Numeric
+        0x800: indicates that values are integers (i.e. Long or Integer)
     0x0018, 1 byte
         [dataType2] (importOPJ).
     0x0019, 4 bytes, int
@@ -143,9 +151,13 @@ The data header block itself has the following structure:
     0x0040, 24 bytes
         Unknown.
     0x0058, 25 bytes, zero-padded string
-        Data name, for worksheets it's "WORKSHEET_COLUMN".
-    0x0071, 10 bytes
-        Unknown.
+        Data name, for worksheets it's "WORKSHEET_COLUMN". Column is at most
+        18 chars long, remaining characters are used for "_", terminating null
+        byte and worksheet name which may be truncated if too long.
+    0x0071, 2 bytes, short int
+        [dataType3] (importOPJ).
+    0x0073, 8 bytes
+        Unknown. Always zeros?
 
 According to importOPJ the bytes starting at 0x0071 didn't exist before
 Origin 5.0.
@@ -153,7 +165,39 @@ Origin 5.0.
 
 ##### Data content block
 
+The data content block consists of consecutive values (e.g. consecutive rows in
+a worksheet column). The number of rows is `totalRows`. `firstRow` indicates
+the first non-empty row (0 is the first row) and `lastRow` indicates the last
+non-empty row.
 
+It should be enough to parse the values up to `lastRow` and skip the remaining
+ones.
+
+Each value is of size indicated by `valueSize` (i.e. the whole block size is
+`valueSize * totalRows`).
+
+The format of the value seems to depend on `valueSize` and `dataType`:
+
+    valueSize = 1: char
+    valueSize = 2: short int
+    valueSize = 4: int or float
+    valueSize = 8: double
+    valueSize > 8: Text
+    valueSize > 8 and dataType & 0x100: Text and Numeric
+
+According to [liborigin][] `dataTypeU = 8` means that an integer value is
+unsigned (this is not verified).
+
+In case of Text values, the value is a null-terminated string. The bytes after
+the null are garbage or earlier contents of the value and can be disregarded.
+
+Text and Numeric values can contain either a double or a string. In this case
+the first two bytes of the value are treated as a prefix. If the first byte is
+equal 0, the value is a double, if it's 1, the value is a string. The second
+prefix byte seems to be always 0. The actual value starts after those two bytes
+and its size is `valueSize - 2`.
+
+`valueSize = 1` seems to be rare or non-existent, at least in Origin 7.0552.
 
 
 ### Parameters section

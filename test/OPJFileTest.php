@@ -31,17 +31,34 @@ class OPJFileTest extends PHPUnit_Framework_TestCase {
             'Data1RANGE', 'Data1Coeff_Time', 'Data1Coeff_Base',
             'Data1Coeff_Spline', 'Data1Coeff_Coeff', 'Data1Coeff_Net',
             'Data1spline_Time', 'Data1spline_Base', 'DATA1BASE', 'Data1_Fit',
-            'Data1_DY', 'Test_Text', 'Test_TextNumeric'
+            'Data1_DY',
+            
+            'TestW_Text', 'TestW_TextNumeric', 'TestW_firstRow'
         );
         foreach ($names as $name) {
             $this->assertArrayHasKey($name, $this->opj->data);
         }
     }
 
-    public function testDataNumericContents() {
+    public function testDataDoubleContents() {
         $this->assertEquals(0.4, $this->opj->data['Data1_INJV'][0]);
         $this->assertEquals(2.0, $this->opj->data['Data1_INJV'][19]);
         $this->assertNull($this->opj->data['Data1_INJV'][20]);
+    }
+
+    public function testDataFloatContents() {
+        $this->assertEquals(345.60001, $this->opj->data['TestW_Float'][0], '', 0.00001);
+        $this->assertEquals(-100000.20313, $this->opj->data['TestW_Float'][1], '', 0.00001);
+    }
+
+    public function testDataLongContents() {
+        $this->assertEquals(345, $this->opj->data['TestW_Long'][0]);
+        $this->assertEquals(-100000, $this->opj->data['TestW_Long'][1]);
+    }
+
+    public function testDataIntegerContents() {
+        $this->assertEquals(34, $this->opj->data['TestW_Integer'][0]);
+        $this->assertEquals(-1000, $this->opj->data['TestW_Integer'][1]);
     }
 
     public function testDataTextNumericContents() {
@@ -49,19 +66,19 @@ class OPJFileTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(-33.23707, $this->opj->data['Data1_DY'][1], '', 0.00001);
         $this->assertEquals(-60.56222, $this->opj->data['Data1_DY'][19], '', 0.00001);
 
-        $this->assertEquals('text', $this->opj->data['Test_TextNumeric'][0]);
-        $this->assertEquals(3.14, $this->opj->data['Test_TextNumeric'][1]);
+        $this->assertEquals('text', $this->opj->data['TestW_TextNumeric'][0]);
+        $this->assertEquals(3.14, $this->opj->data['TestW_TextNumeric'][1]);
     }
 
     public function testDataTextContents() {
-        $this->assertEquals('test string 123', $this->opj->data['Test_Text'][0]);
-        $this->assertEquals('only text', $this->opj->data['Test_Text'][1]);
+        $this->assertEquals('test string 123', $this->opj->data['TestW_Text'][0]);
+        $this->assertEquals('only text', $this->opj->data['TestW_Text'][1]);
     }
 
     public function testFirstRowNotZero() {
-        $this->assertNull($this->opj->data['Test_firstRow'][0]);
-        $this->assertEquals(5.23, $this->opj->data['Test_firstRow'][1]);
-        $this->assertEquals(7, $this->opj->data['Test_firstRow'][2]);
+        $this->assertNull($this->opj->data['TestW_firstRow'][0]);
+        $this->assertEquals(5.23, $this->opj->data['TestW_firstRow'][1]);
+        $this->assertEquals(-7, $this->opj->data['TestW_firstRow'][2]);
     }
 
 }

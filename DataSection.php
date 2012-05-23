@@ -6,6 +6,9 @@ require_once('common.php');
 
 class DataSection extends Section {
     const EMPTY_VALUE = -1.23456789E-300;
+    const DATA_TYPE_INTEGER = 0x800;
+    const DATA_TYPE_TEXTNUMERIC = 0x100;
+
     public $name, $data = array();
     protected $header = array();
 
@@ -32,13 +35,17 @@ class DataSection extends Section {
         $this->name = $this->header['name'];
 
         Logger::log($this->header);
+        Logger::log('dataType bin: ' . prettyBin($this->header['dataType'], 16));
 
         return true;
     }
 
     protected function parseDataContent() {
         $block = $this->file->readBlock();
+        if ($block === NULL) return false;
+
         $valueSize = $this->header['valueSize'];
+        $dataType = $this->header['dataType'];
         $offset = 0;
         $end = $this->header['lastRow'] * $valueSize;
         $rawData = $block->slice($offset, $end - $offset);
@@ -47,15 +54,15 @@ class DataSection extends Section {
             // Numeric
             switch ($valueSize) {
                 case 8: $format = 'd*'; break;
-                case 4: $format = 'V*'; break;
-                case 2: $format = 'v*'; break;
-                case 1: $format = 'C*'; break;
+                case 4: $format = ($dataType & self::DATA_TYPE_INTEGER) ? 'l*' : 'f*'; break;
+                case 2: $format = 's*'; break;
+                case 1: $format = 'c*'; break;
                 default: throw new ParseError("Unknown value size: " + $valueSize);
             }
             $this->data = array_values(unpack($format, $rawData));
         } else {
             while ($offset < $end) {
-                if ($this->header['dataType'] & 0x100) {
+                if ($dataType & self::DATA_TYPE_TEXTNUMERIC) {
                     // Text & Numeric
                     $prefix = ord($block->data[$offset]);
                     if ($prefix === 0) {
@@ -77,6 +84,8 @@ class DataSection extends Section {
         foreach ($this->data as $key => $value) {
             if ($value === self::EMPTY_VALUE) $this->data[$key] = NULL;
         }
+
+        return true;
     }
             
 }
