@@ -13,11 +13,10 @@ class DataSection extends Section {
     protected $header = array();
 
     protected function parse() {
-        Logger::log("Data section at 0x%X", $this->file->offset());
         if ($this->parseDataHeader()) {
             $this->parseDataContent();
         }
-        $this->file->findSectionEnd();
+        $this->file->readBlock();
     }
 
     protected function parseDataHeader() {

@@ -4,6 +4,7 @@ namespace OpenOPJ;
 require_once('Logger.php');
 require_once('common.php');
 require_once('DataList.php');
+require_once('WindowList.php');
 
 class OPJFile {
     public $signature = array(), $header = array(), $data = array();
@@ -41,7 +42,7 @@ class OPJFile {
         } else {
             Logger::log("Unexpected header size: %d, skipping", $block->size());
         }
-        $this->file->findSectionEnd();
+        $this->file->readBlock();
     }
 
     protected function parseDataList() {
@@ -50,7 +51,8 @@ class OPJFile {
     }
 
     protected function parseWindowList() {
-
+        // not implemented, just skips to the next section
+        new WindowList($this->file);
     }
 }
 ?>

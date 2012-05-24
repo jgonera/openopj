@@ -45,7 +45,7 @@ sections end. They can also indicate an empty block.
 File structure
 --------------
 
-OPJ files are divided in the following sections:
+Accoring to [importOPJ][] OPJ files are divided into the following sections:
 
     Signature string
     Header
@@ -55,12 +55,14 @@ OPJ files are divided in the following sections:
         Window sections
             Layer list
                 Layer sections
-                    Sublayers list
-                    Curves list
-                    AxisBreaks list
-                    AxisParameters list
-                    AxisParameters list
-                    AxisParameters list
+                    Sublayer list
+                        Sublayer sections
+                    Curve list
+                        Curve sections
+                    AxisBreak list
+                        AxisBreak sections
+                    3x AxisParameter list
+                        AxisParameter sections
     Parameters section
     Note list
     Project tree
@@ -159,7 +161,7 @@ The data header block itself has the following structure:
     0x0073, 8 bytes
         Unknown. Always zeros?
 
-According to importOPJ the bytes starting at 0x0071 didn't exist before
+According to [importOPJ][] the bytes starting at 0x0071 didn't exist before
 Origin 5.0.
 
 

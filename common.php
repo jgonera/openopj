@@ -99,13 +99,9 @@ class OPJReader extends FileReader {
     }
 
     public function isSectionEnd() {
-        return $this->readSizeBlock() === 0;
-    }
-
-    public function findSectionEnd() {
-        while ($block = $this->readBlock()) {
-            Logger::log("Skipping unknown block of size %d at 0x%X", $block->size(), $this->offset());
-        }
+        $isEnd = $this->readSizeBlock() === 0;
+        if ($isEnd) $this->lastSize = NULL;
+        return $isEnd;
     }
 }
 
@@ -114,6 +110,7 @@ abstract class Section {
 
     public function __construct($file) {
         $this->file = $file;
+        Logger::log("%s at 0x%X", get_class($this), $this->file->offset());
         $this->parse();
     }
 }
