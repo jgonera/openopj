@@ -46,30 +46,19 @@ class DataSection extends Section {
 
         $valueSize = $this->header['valueSize'];
         $dataType = $this->header['dataType'];
-        $offset = 0;
-        $end = $this->header['lastRow'] * $valueSize;
-        $rawData = $block->slice($offset, $end - $offset);
 
         if ($valueSize <= 8) {
             // Numeric
-            switch ($valueSize) {
-                case 8: $format = 'd*'; break;
-                case 4: $format = ($dataType & self::DATA_TYPE_INTEGER) ? 'l*' : 'f*'; break;
-                case 2: $format = 's*'; break;
-                case 1: $format = 'c*'; break;
-                default: throw new ParseError("Unknown value size: " + $valueSize);
-            }
-            $this->data = array_values(unpack($format, $rawData));
+            $format = $this->getFormat();
+            $this->data = array_values(unpack($format, $block->data));
         } else {
+            $offset = 0;
+            $end = $this->header['lastRow'] * $valueSize;
             while ($offset < $end) {
                 if ($dataType & self::DATA_TYPE_TEXTNUMERIC) {
                     // Text & Numeric
                     $prefix = ord($block->data[$offset]);
-                    if ($prefix === 0) {
-                        $format = 'd';
-                    } else {
-                        $format = sprintf('a%d', $valueSize - 2);
-                    }
+                    $format = $prefix === 0 ? 'd' : sprintf('a%d', $valueSize - 2);
                     list(, $this->data[]) = unpack($format, $block->slice($offset + 2, $valueSize - 2));
                 } else {
                     // Text
@@ -86,6 +75,17 @@ class DataSection extends Section {
         }
 
         return true;
+    }
+
+    protected function getFormat() {
+        $isInteger = $this->header['dataType'] & self::DATA_TYPE_INTEGER;
+        switch ($this->header['valueSize']) {
+            case 8: return 'd*';
+            case 4: return $isInteger ? 'l*' : 'f*';
+            case 2: return 's*';
+            case 1: return 'c*';
+            default: throw new ParseError("Unknown value size: " + $this->header['valueSize']);
+        }
     }
             
 }

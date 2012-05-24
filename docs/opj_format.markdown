@@ -33,7 +33,7 @@ General observations
 in case it contains 0x0A as its data in which case it could not be treated
 as a regular block separator).
 
-    0x0000, 4 bytes, int
+    0x0000, 4 bytes, uint32
       Size of the following block.
 
 Sometimes there are 4-byte blocks filled with 0s. There is no zero-length
@@ -128,25 +128,25 @@ The data header block itself has the following structure:
 
     0x0000, 22 bytes
         Unknown.
-    0x0016, 2 bytes, short int
+    0x0016, 2 bytes, uint16
         [dataType] (liborigin). Known flags:
         0x100: indicates that values are Text & Numeric
         0x800: indicates that values are integers (i.e. Long or Integer)
-    0x0018, 1 byte
+    0x0018, 1 byte, uint8
         [dataType2] (importOPJ).
-    0x0019, 4 bytes, int
+    0x0019, 4 bytes, uint32
         [totalRows] (importOPJ).
-    0x001D, 4 bytes, int
+    0x001D, 4 bytes, uint32
         [firstRow] (importOPJ).
-    0x0021, 4 bytes, int
+    0x0021, 4 bytes, uint32
         [lastRow] (importOPJ).
     0x0025, 24 bytes
         Unknown.
-    0x003D, 1 byte
+    0x003D, 1 byte, uint8
         [valueSize], size of a single data value.
     0x003E, 1 byte
         Unknown.
-    0x003F, 1 byte
+    0x003F, 1 byte, uint8
         [dataTypeU] (liborigin).
     0x0040, 24 bytes
         Unknown.
@@ -154,7 +154,7 @@ The data header block itself has the following structure:
         Data name, for worksheets it's "WORKSHEET_COLUMN". Column is at most
         18 chars long, remaining characters are used for "_", terminating null
         byte and worksheet name which may be truncated if too long.
-    0x0071, 2 bytes, short int
+    0x0071, 2 bytes, uint16
         [dataType3] (importOPJ).
     0x0073, 8 bytes
         Unknown. Always zeros?
@@ -178,9 +178,9 @@ Each value is of size indicated by `valueSize` (i.e. the whole block size is
 
 The format of the value seems to depend on `valueSize` and `dataType`:
 
-    valueSize = 1: char
-    valueSize = 2: short int
-    valueSize = 4: int or float
+    valueSize = 1: int8
+    valueSize = 2: int16
+    valueSize = 4: int32 or float
     valueSize = 8: double
     valueSize > 8: Text
     valueSize > 8 and dataType & 0x100: Text and Numeric
