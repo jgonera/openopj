@@ -217,5 +217,5 @@ consists of:
         Line feed.
 
 The last parameter element is followed by a 0 byte and a line feed (`00 0A`),
-i.e. if you encounter a parameter name equal to 0x0, there are no more
+i.e. if you encounter a parameter name equal to "\0", there are no more
 parameter elements.

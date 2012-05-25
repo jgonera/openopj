@@ -5,9 +5,10 @@ require_once('Logger.php');
 require_once('common.php');
 require_once('DataList.php');
 require_once('WindowList.php');
+require_once('ParametersSection.php');
 
 class OPJFile {
-    public $signature = array(), $header = array(), $data = array();
+    public $signature = array(), $header = array(), $data, $parameters;
 
     public function __construct($fileName) {
         $this->file = new OPJReader($fileName);
@@ -20,6 +21,7 @@ class OPJFile {
         $this->parseHeader();
         $this->parseDataList();
         $this->parseWindowList();
+        $this->parseParametersSection();
     }
 
     protected function parseSignature() {
@@ -53,6 +55,11 @@ class OPJFile {
     protected function parseWindowList() {
         // not implemented, just skips to the next section
         new WindowList($this->file);
+    }
+
+    protected function parseParametersSection() {
+        $parametersSection = new ParametersSection($this->file);
+        $this->parameters = $parametersSection->parameters;
     }
 }
 ?>

@@ -81,5 +81,12 @@ class OPJFileTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(-7, $this->opj->data['TestW_firstRow'][2]);
     }
 
+    public function testParameters() {
+        $this->assertEquals(1, $this->opj->parameters['ERR']);
+        $this->assertEquals(1.25, $this->opj->parameters['SYRNG_C_DATA1']);
+        $this->assertEquals(0.1246, $this->opj->parameters['CELL_C_DATA1']);
+        $this->assertEquals(1.28889201142965, $this->opj->parameters['S']);
+    }
+
 }
 ?>
