@@ -62,7 +62,7 @@ Accoring to [importOPJ][] OPJ files are divided into the following sections:
                         Curve sections
                     AxisBreak list
                         AxisBreak sections
-                    3x AxisParameter list
+                    3 AxisParameter lists
                         AxisParameter sections
     Parameters section
     Note list
@@ -205,6 +205,32 @@ prefix byte seems to be always 0. The actual value starts after those two bytes
 and its size is `valueSize - 2`.
 
 `valueSize = 1` seems to be rare or non-existent, at least in Origin 7.0552.
+
+
+### Window list
+
+As of now, the description of window list and its subsections is incomplete
+and merely serves as an indication of how to skip to the parameters section.
+
+    Window list
+        Window sections
+            1 block
+            Layer list
+                Layer sections
+                    1 block
+                    Sublayer list
+                        Sublayer sections
+                            4 blocks
+                            (maybe additional nesting according to importOPJ)
+                    Curve list
+                        Curve sections
+                            2 blocks
+                    AxisBreak list
+                        AxisBreak sections
+                            1 block
+                    3 AxisParameter lists
+                        AxisParameter sections
+                            1 block
 
 
 ### Parameters section
