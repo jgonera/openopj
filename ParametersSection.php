@@ -16,6 +16,7 @@ class ParametersSection extends Section {
             $this->parameters[$name] = $value;
             Logger::log("Parameter %s: %f", $name, $value);
         }
+        $this->file->readBlock();
     }
 }
 

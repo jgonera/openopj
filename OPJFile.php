@@ -6,9 +6,10 @@ require_once('common.php');
 require_once('DataList.php');
 require_once('WindowList.php');
 require_once('ParametersSection.php');
+require_once('NoteList.php');
 
 class OPJFile {
-    public $signature = array(), $header = array(), $data, $parameters;
+    public $signature = array(), $header = array(), $data, $parameters, $notes;
 
     public function __construct($fileName) {
         $this->file = new OPJReader($fileName);
@@ -22,6 +23,7 @@ class OPJFile {
         $this->parseDataList();
         $this->parseWindowList();
         $this->parseParametersSection();
+        $this->parseNoteList();
     }
 
     protected function parseSignature() {
@@ -38,7 +40,7 @@ class OPJFile {
 
     protected function parseHeader() {
         $block = $this->file->readBlock();
-        if ($block->size() === 39) {
+        if ($block->size() >= 39) {
             $this->header = unpack('doriginVersion', $block->slice(0x1B, 8));
             Logger::log("Origin version: %s", $this->header['originVersion']);
         } else {
@@ -60,6 +62,11 @@ class OPJFile {
     protected function parseParametersSection() {
         $parametersSection = new ParametersSection($this->file);
         $this->parameters = $parametersSection->parameters;
+    }
+
+    protected function parseNoteList() {
+        $noteList = new NoteList($this->file);
+        $this->notes = $noteList->notes;
     }
 }
 ?>

@@ -66,13 +66,18 @@ Accoring to [importOPJ][] OPJ files are divided into the following sections:
                         AxisParameter sections
     Parameters section
     Note list
+        Note sections
     Project tree
-    Folder tree
-    File list
-    Folder list
+        Folder tree
+            File list
+                File sections
+            Folder list
+                Folder trees
     Attachment list
-        Attachment sublist 1
-        Attachment sublist 2
+        Attachment-1 sublist
+            Attachment-1 sections
+        Attachment-2 sublist
+            Attachment-2 sections
 
 Lists are always terminated with a null block (`0A 00 00 00 00 0A`).
 
@@ -204,8 +209,8 @@ and its size is `valueSize - 2`.
 
 ### Parameters section
 
-This section contains an arbitrary number of parameter elements. Each element
-consists of:
+This section does not contain blocks. Instead it contains an arbitrary number
+of parameter elements. Each element consists of:
 
     0x0000, n characters
         Parameter name.
@@ -219,3 +224,19 @@ consists of:
 The last parameter element is followed by a 0 byte and a line feed (`00 0A`),
 i.e. if you encounter a parameter name equal to "\0", there are no more
 parameter elements.
+
+The section ends with a null block (or possibly it's another section which is
+usually empty).
+
+
+### Note list
+
+Note list contains multiple note sections one after another.
+
+
+#### Note section
+
+Note sections are composed of three blocks: header, name and contents. Header's
+structure is unknown and, as of now, it can be skipped. Name and contents both
+are blocks which contain a null-terminated string.
+

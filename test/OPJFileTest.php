@@ -88,5 +88,23 @@ class OPJFileTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(1.28889201142965, $this->opj->parameters['S']);
     }
 
+    public function testNotes() {
+        $this->assertEquals(
+            "Data1 Temperature:\t25.10242\r\n\r\n",
+            $this->opj->notes['Results']
+        );
+        $this->assertEquals(
+            "[3/5/2009 13:32 \"/DeltaH\" (2454895)]\r\n" .
+            "Data: Data1_NDH\r\n" .
+            "Model: OneSites\r\n" .
+            "Chi^2/DoF = 3008\r\n" .
+            "N\t0.800\t0.0346\r\n" .
+            "K\t1.75E4\t1.86E3\r\n" .
+            "H\t-5406\t340.5\r\n" .
+            "S\t1.29\r\n\r\n",
+            $this->opj->notes['ResultsLog']
+        );
+    }
+
 }
 ?>

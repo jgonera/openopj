@@ -65,10 +65,11 @@ class Fragment {
         if (ord($this->slice(-1, 1)) !== self::FRAGMENT_SEPARATOR) {
             throw new FragmentSeparatorError("Wrong fragment separator");
         }
+        $this->data = $this->slice(0, -1);
     }
 
     public function size() {
-        return mb_strlen($this->data, '8bit') - 1;
+        return mb_strlen($this->data, '8bit');
     }
 
     public function slice($offset, $length) {
