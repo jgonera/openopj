@@ -9,7 +9,7 @@ class DataList extends Section {
     public $data = array();
 
     protected function parse() {
-        while (!$this->file->isSectionEnd()) {
+        while (!$this->file->isNextBlockNull()) {
             $dataSection = new DataSection($this->file);
             $this->data[$dataSection->name] = $dataSection->data;
         }

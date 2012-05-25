@@ -5,7 +5,7 @@ class OpenOPJException extends \Exception {}
 class FileReadError extends OpenOPJException {}
 class ParseError extends OpenOPJException {}
 class UnexpectedEndError extends ParseError {}
-class BlockSeparatorError extends ParseError {}
+class FragmentSeparatorError extends ParseError {}
 
 function prettyHex($data) {
     return chunk_split(bin2hex($data), 2, ' ');
@@ -56,14 +56,14 @@ class FileReader {
 
 // binary data wrapper, uses mb_* functions in case mbstring.func_overload is
 // set
-class Block {
-    const BLOCK_SEPARATOR = 0x0A;
+class Fragment {
+    const FRAGMENT_SEPARATOR = 0x0A;
     public $data;
 
     public function __construct($data) {
         $this->data = $data;
-        if (ord($this->slice(-1, 1)) !== self::BLOCK_SEPARATOR) {
-            throw new BlockSeparatorError("Wrong block separator");
+        if (ord($this->slice(-1, 1)) !== self::FRAGMENT_SEPARATOR) {
+            throw new FragmentSeparatorError("Wrong fragment separator");
         }
     }
 
@@ -77,41 +77,46 @@ class Block {
 }
 
 class OPJReader extends FileReader {
-    protected $lastSize = NULL;
+    const SIZE_LENGTH = 5;
 
-    protected function readSizeBlock() {
-        // if we already read the size in isSectionEnd(), do not read again
-        if ($this->lastSize !== NULL) return $this->lastSize;
-
-        $block = new Block($this->read(5));
-        list(, $size) = unpack('V', $block->slice(0x0, 4));
-        $this->lastSize = $size;
-        Logger::log("Size block (%d) at 0x%X", $size, $this->offset() - 5);
+    protected function readSize() {
+        $sizeFragment = new Fragment($this->read(self::SIZE_LENGTH));
+        list(, $size) = unpack('V', $sizeFragment->data);
         return $size;
     }
 
-    public function readBlock() {
-        $size = $this->readSizeBlock();
-        $this->lastSize = NULL;
+    public function readBlock($keep=false) {
+        $size = $this->readSize();
+        Logger::log(
+            "Block of size %d at 0x%X",
+            $size, $this->offset() - self::SIZE_LENGTH
+        );
 
         if ($size === 0) return NULL;
-        return new Block($this->read($size + 1));
+        return new Fragment($this->read($size + 1));
     }
 
-    public function isSectionEnd() {
-        $isEnd = $this->readSizeBlock() === 0;
-        if ($isEnd) $this->lastSize = NULL;
-        return $isEnd;
+    public function isNextBlockNull() {
+        $size = $this->readSize();
+        if ($size === 0) {
+            return true;
+        } else {
+            $this->seek(-self::SIZE_LENGTH);
+            return false;
+        }
     }
 }
 
 abstract class Section {
     protected $file;
+    public $offset;
 
     public function __construct($file) {
         $this->file = $file;
-        Logger::log("%s at 0x%X", get_class($this), $this->file->offset());
+        $this->offset = $this->file->offset();
+        Logger::log("%s at 0x%X", get_class($this), $this->offset);
         $this->parse();
+        Logger::log("End of %s at 0x%X", get_class($this), $this->file->offset());
     }
 }
 

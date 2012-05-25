@@ -23,23 +23,24 @@ Author: Juliusz Gonera
 General observations
 --------------------
 
-* Files seem to be divided into blocks sperated by line feeds (0x0A).
-* Integers are little endian.
+* Files are divided into fragments sperated by line feeds (0x0A).
+* Numbers are little endian.
 
 
-### Size blocks
+### Blocks
 
-4-byte blocks seem to indicate the size of the following block (most likely
-in case it contains 0x0A as its data in which case it could not be treated
-as a regular block separator).
+4-byte fragments usually indicate the size (uint32) of the following fragment.
+Such a 4-byte fragment and a following fragment together form a block.
 
-    0x0000, 4 bytes, uint32
-      Size of the following block.
+Sometimes there are 4-byte fragments filled with 0s. There is no zero-length
+fragment following them. Such a single 0 size fragment is called a null block.
 
-Sometimes there are 4-byte blocks filled with 0s. There is no zero-length
-block following them. They seem to serve as a separator of file sections
-and can appear in groups (often of 2 or 3, sometimes 5) if several nested
-sections end. They can also indicate an empty block.
+Null blocks seem to serve as a separator of file sections (especially lists,
+i.e. sections that contain other sections) and can appear in groups (often of
+2 or 3, sometimes 5) if several nested sections end.
+
+In block descriptions the relative offsets refer to the offset in the second
+fragment. Likewise, the size of a block is the size of the second fragment.
 
 
 File structure
@@ -73,7 +74,7 @@ Accoring to [importOPJ][] OPJ files are divided into the following sections:
         Attachment sublist 1
         Attachment sublist 2
 
-Sections are terminated with a 0 size block (`0A 00 00 00 00 0A`).
+Lists are always terminated with a null block (`0A 00 00 00 00 0A`).
 
 
 ### Signature
@@ -88,12 +89,11 @@ with a line feed (0x0A).
     0x000C, 4 chars (not constant?)
         Origin build number terminated with "#"
 
-This is the only section that doesn't end with a 0 size block.
-
 
 ### Header
 
-Since Origin 6.1 contains Origin version (importOPJ).
+Since Origin 6.1 contains Origin version (importOPJ). Consists of two blocks:
+one with data and one null block. The data block is as follows:
 
     0x0000, 27 bytes
         Unknown.
@@ -110,9 +110,9 @@ Data list contains multiple data sections one after another.
 
 #### Data section
 
-Data section consists of two blocks: header and content. It can contain
-worksheet column values, matrix or graph data. liborigin calls each data
-section a "column".
+Data section consists of three blocks: header, content and a null block. It can
+contain worksheet column values, matrix or graph data. liborigin calls each
+data section a "column".
 
 There is a separate data section for each worksheet column. In case of
 matrices, the values are stored in row-major order.

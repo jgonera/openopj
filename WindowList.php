@@ -6,7 +6,7 @@ require_once('common.php');
 
 class WindowList extends Section {
     protected function parse() {
-        while (!$this->file->isSectionEnd()) {
+        while (!$this->file->isNextBlockNull()) {
             new WindowSection($this->file);
         }
     }
@@ -21,7 +21,7 @@ class WindowSection extends Section {
 
 class LayerList extends Section {
     protected function parse() {
-        while (!$this->file->isSectionEnd()) {
+        while (!$this->file->isNextBlockNull()) {
             new LayerSection($this->file);
         }
     }
@@ -41,7 +41,7 @@ class LayerSection extends Section {
 
 class SublayerList extends Section {
     protected function parse() {
-        while (!$this->file->isSectionEnd()) {
+        while (!$this->file->isNextBlockNull()) {
             new SublayerSection($this->file);
         }
     }
@@ -59,7 +59,7 @@ class SublayerSection extends Section {
 
 class CurveList extends Section {
     protected function parse() {
-        while (!$this->file->isSectionEnd()) {
+        while (!$this->file->isNextBlockNull()) {
             new CurveSection($this->file);
         }
     }
@@ -74,7 +74,7 @@ class CurveSection extends Section {
 
 class AxisBreakList extends Section {
     protected function parse() {
-        while (!$this->file->isSectionEnd()) {
+        while (!$this->file->isNextBlockNull()) {
             new AxisBreakSection($this->file);
         }
     }
@@ -88,7 +88,7 @@ class AxisBreakSection extends Section {
 
 class AxisParameterList extends Section {
     protected function parse() {
-        while (!$this->file->isSectionEnd()) {
+        while (!$this->file->isNextBlockNull()) {
             new AxisParameterSection($this->file);
         }
     }

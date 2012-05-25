@@ -13,17 +13,15 @@ class DataSection extends Section {
     protected $header = array();
 
     protected function parse() {
-        if ($this->parseDataHeader()) {
-            $this->parseDataContent();
-        }
+        $this->parseDataHeader();
+        $this->parseDataContent();
         $this->file->readBlock();
     }
 
     protected function parseDataHeader() {
         $block = $this->file->readBlock();
         if ($block->size() < 113) {
-            Logger::log("Unexpected data header block size: $size");
-            return false;
+            throw new ParseError("Unexpected data header block size: $size");
         }
         $this->header = unpack(
             'vdataType/CdataType2/VtotalRows/VfirstRow/VlastRow',
@@ -35,13 +33,11 @@ class DataSection extends Section {
 
         Logger::log($this->header);
         Logger::log('dataType bin: ' . prettyBin($this->header['dataType'], 16));
-
-        return true;
     }
 
     protected function parseDataContent() {
         $block = $this->file->readBlock();
-        if ($block === NULL) return false;
+        if ($block === NULL) return;
 
         $valueSize = $this->header['valueSize'];
         $dataType = $this->header['dataType'];
@@ -72,8 +68,6 @@ class DataSection extends Section {
         foreach ($this->data as $key => $value) {
             if ($value === self::EMPTY_VALUE) $this->data[$key] = NULL;
         }
-
-        return true;
     }
 
     protected function getFormat() {
