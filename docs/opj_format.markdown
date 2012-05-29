@@ -97,8 +97,8 @@ with a line feed (0x0A).
 
 ### Header
 
-Since Origin 6.1 contains Origin version (importOPJ). Consists of two blocks:
-one with data and one null block. The data block is as follows:
+Since Origin 6.1 contains Origin version (acc. to [importOPJ][]). Consists of
+two blocks: one with data and one null block. The data block is as follows:
 
     0x0000, 27 bytes
         Unknown.
@@ -136,25 +136,25 @@ The data header block itself has the following structure:
     0x0000, 22 bytes
         Unknown.
     0x0016, 2 bytes, uint16
-        [dataType] (liborigin). Known flags:
+        dataType (liborigin). Known flags:
         0x100: indicates that values are Text & Numeric
         0x800: indicates that values are integers (i.e. Long or Integer)
     0x0018, 1 byte, uint8
-        [dataType2] (importOPJ).
+        dataType2 (importOPJ).
     0x0019, 4 bytes, uint32
-        [totalRows] (importOPJ).
+        totalRows (importOPJ).
     0x001D, 4 bytes, uint32
-        [firstRow] (importOPJ).
+        firstRow (importOPJ).
     0x0021, 4 bytes, uint32
-        [lastRow] (importOPJ).
+        lastRow (importOPJ).
     0x0025, 24 bytes
         Unknown.
     0x003D, 1 byte, uint8
-        [valueSize], size of a single data value.
+        valueSize, size of a single data value.
     0x003E, 1 byte
         Unknown.
     0x003F, 1 byte, uint8
-        [dataTypeU] (liborigin).
+        dataTypeU (liborigin).
     0x0040, 24 bytes
         Unknown.
     0x0058, 25 bytes, zero-padded string
@@ -162,7 +162,7 @@ The data header block itself has the following structure:
         18 chars long, remaining characters are used for "_", terminating null
         byte and worksheet name which may be truncated if too long.
     0x0071, 2 bytes, uint16
-        [dataType3] (importOPJ).
+        dataType3 (importOPJ).
     0x0073, 8 bytes
         Unknown. Always zeros?
 
