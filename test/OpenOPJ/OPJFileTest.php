@@ -1,6 +1,4 @@
 <?php
-require_once('test/helper.php');
-
 use OpenOPJ\OPJFile;
 
 class OPJFileTest extends PHPUnit_Framework_TestCase {

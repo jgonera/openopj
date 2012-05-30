@@ -1,5 +1,5 @@
 <?php
-require_once('OPJFile.php');
+require_once('lib/OpenOPJ/OPJFile.php');
 
 if (getenv('LOG')) {
     OpenOPJ\Logger::addHandler(function($msg) {

@@ -1,5 +1,5 @@
 <?php
-require_once('OPJFile.php');
+require_once('lib/OpenOPJ/OPJFile.php');
 
 use OpenOPJ\OPJFile;
 

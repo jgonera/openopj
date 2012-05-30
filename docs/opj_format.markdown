@@ -1,6 +1,8 @@
 OPJ (Origin Project files) format description
 =============================================
 
+Author: Juliusz Gonera
+
 This file contains a description of OPJ file format. It is incomplete
 and contains only what was necessary for the author.
 
@@ -9,9 +11,12 @@ addon (version 1.24.0.2, addon disk version 7.10).
 Version of OPJ files: 4.2673, build: 552.
 
 Some format information taken from [liborigin][], [liborigin2][]
-and [SciDAVis][] [importOPJ][] filter in Python.
+and [SciDAVis][] [importOPJ][] filter in Python. If you need information on
+OPJ sections not described in this document [importOPJ][] docs are a good
+starting point.
 
-Author: Juliusz Gonera
+If you update this document, please fork the repository and make a pull
+request.
 
 [ITC200]: http://www.microcal.com/products/itc/itc200.asp
 [liborigin]: http://sourceforge.net/projects/liborigin/
