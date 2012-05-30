@@ -10,7 +10,7 @@ of the supported features of the OPJ format (see `docs/opj_format.markdown`)
 and a test suite.
 
 The parser has been developed in the [Minor Laboratory][] at the [University
-of Virginia][].
+of Virginia][] and is licensed under the MIT license.
 
 [Origin]: http://www.originlab.com/index.aspx?go=PRODUCTS/Origin
 [Minor Laboratory]: http://olenka.med.virginia.edu/CrystUVa/wladek_home.php
