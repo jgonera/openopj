@@ -73,10 +73,15 @@ class OPJFileTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals('only text', $this->opj->data['TestW_Text'][1]);
     }
 
-    public function testFirstRowNotZero() {
+    public function testDataFirstRowNotZero() {
         $this->assertNull($this->opj->data['TestW_firstRow'][0]);
         $this->assertEquals(5.23, $this->opj->data['TestW_firstRow'][1]);
         $this->assertEquals(-7, $this->opj->data['TestW_firstRow'][2]);
+    }
+
+    public function testDataRowCount() {
+        $this->assertCount(2, $this->opj->data['TestW_Float']);
+        $this->assertCount(2, $this->opj->data['TestW_TextNumeric']);
     }
 
     public function testParameters() {

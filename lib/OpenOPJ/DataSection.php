@@ -41,14 +41,14 @@ class DataSection extends Section {
 
         $valueSize = $this->header['valueSize'];
         $dataType = $this->header['dataType'];
+        $end = $this->header['lastRow'] * $valueSize;
 
         if ($valueSize <= 8) {
             // Numeric
             $format = $this->getFormat();
-            $this->data = array_values(unpack($format, $block->data));
+            $this->data = array_values(unpack($format, $block->slice(0, $end)));
         } else {
             $offset = 0;
-            $end = $this->header['lastRow'] * $valueSize;
             while ($offset < $end) {
                 if ($dataType & self::DATA_TYPE_TEXTNUMERIC) {
                     // Text & Numeric
