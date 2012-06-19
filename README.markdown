@@ -49,3 +49,6 @@ repository with submodules you can use `make test` to run them with an
 RSpec-like result printer. Otherwise, just run `phpunit` in the repository
 directory.
 
+For debugging purposes you can run the tests with an STDERR logger with
+`LOG=1 make test` or `LOG=1 phpunit`.
+
