@@ -17,6 +17,26 @@ of Virginia][] and is licensed under the MIT license.
 [University of Virginia]: http://www.virginia.edu/
 
 
+How to use
+----------
+
+```php
+require_once('openopj/lib/OpenOPJ.php');
+
+// read from file
+$opj = new OPJFile(new FileReader('path/file.opj'));
+// or read from string (e.g. when stored in DB, fetched from other server)
+$opj = new OPJFile(new StringReader($binaryString));
+
+// first row of a column in a worksheet
+echo $opj->data['Worksheet_Column'][0];
+// parameter
+echo $opj->parameters['SOME_NAME'];
+// notes, e.g. ResultsLog
+echo $opj->notes['ResultsLog'];
+```
+
+
 Tests
 -----
 
