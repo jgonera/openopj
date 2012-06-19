@@ -21,7 +21,10 @@ How to use
 ----------
 
 ```php
+<?php
 require_once('openopj/lib/OpenOPJ.php');
+
+use OpenOPJ\OPJFile, OpenOPJ\FileReader, OpenOPJ\StringReader;
 
 // read from file
 $opj = new OPJFile(new FileReader('path/file.opj'));
@@ -34,6 +37,7 @@ echo $opj->data['Worksheet_Column'][0];
 echo $opj->parameters['SOME_NAME'];
 // notes, e.g. ResultsLog
 echo $opj->notes['ResultsLog'];
+?>
 ```
 
 
