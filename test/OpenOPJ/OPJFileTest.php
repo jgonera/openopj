@@ -1,15 +1,10 @@
 <?php
-use OpenOPJ\OPJFile;
+use OpenOPJ\OPJFile, OpenOPJ\FileReader;
 
 class OPJFileTest extends PHPUnit_Framework_TestCase {
 
     protected function setUp() {
-        $this->opj = new OPJFile('support/test.opj');
-    }
-
-    public function testFileReadError() {
-        $this->setExpectedException('OpenOPJ\FileReadError');
-        $opj = new OPJFile('support/nonexistent.opj');
+        $this->opj = new OPJFile(new FileReader('support/test.opj'));
     }
 
     public function testSignature() {

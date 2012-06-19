@@ -11,8 +11,8 @@ require_once('NoteList.php');
 class OPJFile {
     public $signature = array(), $header = array(), $data, $parameters, $notes;
 
-    public function __construct($fileName) {
-        $this->file = new OPJReader($fileName);
+    public function __construct($reader) {
+        $this->file = new OPJReader($reader);
         $this->parse();
         unset($this->file);
     }

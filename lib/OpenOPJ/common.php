@@ -2,7 +2,6 @@
 namespace OpenOPJ;
 
 class OpenOPJException extends \Exception {}
-class FileReadError extends OpenOPJException {}
 class ParseError extends OpenOPJException {}
 class UnexpectedEndError extends ParseError {}
 class FragmentSeparatorError extends ParseError {}
@@ -13,45 +12,6 @@ function prettyHex($data) {
 
 function prettyBin($data, $length=32) {
     return chunk_split(str_pad(decbin($data), $length, '0', STR_PAD_LEFT), 8, ' ');
-}
-
-class FileReader {
-    protected $fileHandle;
-
-    public function __construct($fileName) {
-        $this->fileHandle = @fopen($fileName, 'rb');
-        if (!$this->fileHandle) throw new FileReadError("Can't read file $fileName");
-        flock($this->fileHandle, LOCK_SH);
-    }
-
-    public function __destruct() {
-        flock($this->fileHandle, LOCK_UN);
-        fclose($this->fileHandle);
-    }
-
-    public function offset() {
-        return ftell($this->fileHandle);
-    }
-
-    public function readLine() {
-        return fgets($this->fileHandle);
-    }
-
-    public function read($count) {
-        $data = fread($this->fileHandle, $count);
-        if (!$data) {
-            throw new UnexpectedEndError();
-        }
-        return $data;
-    }
-
-    public function seek($count) {
-        fseek($this->fileHandle, $count, SEEK_CUR);
-    }
-
-    public function isEnd() {
-        return feof($this->fileHandle);
-    }
 }
 
 // binary data wrapper, uses mb_* functions in case mbstring.func_overload is
@@ -77,24 +37,40 @@ class Fragment {
     }
 }
 
-class OPJReader extends FileReader {
+class OPJReader {
     const SIZE_LENGTH = 5;
 
+    public function __construct($reader) {
+        $this->reader = $reader;
+    }
+
     protected function readSize() {
-        $sizeFragment = new Fragment($this->read(self::SIZE_LENGTH));
+        $sizeFragment = new Fragment($this->reader->read(self::SIZE_LENGTH));
         list(, $size) = unpack('V', $sizeFragment->data);
         return $size;
+    }
+
+    public function offset() {
+        return $this->reader->offset();
+    }
+
+    public function readLine() {
+        return $this->reader->readLine();
+    }
+
+    public function read($count) {
+        return $this->reader->read($count);
     }
 
     public function readBlock($keep=false) {
         $size = $this->readSize();
         Logger::log(
             "Block of size %d at 0x%X",
-            $size, $this->offset() - self::SIZE_LENGTH
+            $size, $this->reader->offset() - self::SIZE_LENGTH
         );
 
         if ($size === 0) return NULL;
-        return new Fragment($this->read($size + 1));
+        return new Fragment($this->reader->read($size + 1));
     }
 
     public function isNextBlockNull() {
@@ -102,7 +78,7 @@ class OPJReader extends FileReader {
         if ($size === 0) {
             return true;
         } else {
-            $this->seek(-self::SIZE_LENGTH);
+            $this->reader->seek(-self::SIZE_LENGTH);
             return false;
         }
     }
