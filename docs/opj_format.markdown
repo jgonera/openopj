@@ -238,6 +238,19 @@ and merely serves as an indication of how to skip to the parameters section.
                             1 block
 
 
+#### Window section
+
+Window section contains a header block and a layer list. The header has the
+following structure:
+
+    0x0000, 2 bytes
+        Unknown, always zero?
+    0x0002, 25 bytes, zero-padded string
+        Name.
+    0x001B, n bytes
+        See importOPJ for details.
+
+
 ### Parameters section
 
 This section does not contain blocks. Instead it contains an arbitrary number
