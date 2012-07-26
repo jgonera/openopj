@@ -79,6 +79,16 @@ class OPJFileTest extends PHPUnit_Framework_TestCase {
         $this->assertCount(2, $this->opj->data['TestW_TextNumeric']);
     }
 
+    public function testWindowsNames() {
+        $names = array(
+            'Data1', 'Data1Coeff', 'Data1RAW', 'Data1spline', 'DeltaH',
+            'ITCFINAL', 'mRawITC'
+        );
+        foreach ($names as $name) {
+            $this->assertArrayHasKey($name, $this->opj->windows);
+        }
+    }
+    
     public function testParameters() {
         $this->assertEquals(1, $this->opj->parameters['ERR']);
         $this->assertEquals(1.25, $this->opj->parameters['SYRNG_C_DATA1']);

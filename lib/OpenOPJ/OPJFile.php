@@ -55,8 +55,9 @@ class OPJFile {
     }
 
     protected function parseWindowList() {
-        // not implemented, just skips to the next section
-        new WindowList($this->file);
+        // not implemented (only window names), skips to the next section
+        $windowList = new WindowList($this->file);
+        $this->windows = $windowList->windows;
     }
 
     protected function parseParametersSection() {

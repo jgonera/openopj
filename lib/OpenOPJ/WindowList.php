@@ -5,16 +5,27 @@ require_once('Logger.php');
 require_once('common.php');
 
 class WindowList extends Section {
+    public $windows = array();
+
     protected function parse() {
         while (!$this->file->isNextBlockNull()) {
-            new WindowSection($this->file);
+            $windowSection = new WindowSection($this->file);
+            $this->windows[$windowSection->name] = $windowSection->window;
         }
     }
 }
 
 class WindowSection extends Section {
+    public $name, $window = array();
+
     protected function parse() {
-        $this->file->readBlock();
+        $block = $this->file->readBlock();
+        $header = unpack('a25name', $block->slice(0x02, 25));
+        $this->name = $header['name'];
+        $this->window = $header;
+
+        Logger::log($header);
+
         new LayerList($this->file);
     }
 }
