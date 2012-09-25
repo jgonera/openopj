@@ -28,6 +28,9 @@ class OPJFile {
 
     protected function parseSignature() {
         $tmp = explode(' ', $this->file->readLine());
+        if ($tmp[0] !== 'CPYA') {
+            throw new WrongSignatureError("File doesn't seem to be an OPJ file");
+        }
         $this->signature['id'] = $tmp[0];
         $this->signature['version'] = $tmp[1];
         $this->signature['build'] = (int)$tmp[2];

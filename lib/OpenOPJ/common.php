@@ -3,6 +3,7 @@ namespace OpenOPJ;
 
 class OpenOPJException extends \Exception {}
 class ParseError extends OpenOPJException {}
+class WrongSignatureError extends ParseError {}
 class UnexpectedEndError extends ParseError {}
 class FragmentSeparatorError extends ParseError {}
 

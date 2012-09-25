@@ -13,6 +13,11 @@ class OPJFileTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(552, $this->opj->signature['build']);
     }
 
+    public function testSingatureException() {
+        $this->setExpectedException('OpenOPJ\WrongSignatureError');
+        new OPJFile(new FileReader('support/test.txt'));
+    }
+
     public function testHeader() {
         $this->assertEquals(7.0552, $this->opj->header['originVersion']);
     }

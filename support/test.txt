@@ -1,0 +1,1 @@
+Not an OPJ file, just a text file to test signature detection.
